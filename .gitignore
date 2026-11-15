@@ -1,4 +1,6 @@
 *.dll
 *.dll.*
+!/ssh-original.dll
+!/ssh-patched.dll
 __pycache__/
 *.pyc

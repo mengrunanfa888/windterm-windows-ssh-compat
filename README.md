@@ -2,34 +2,33 @@
 
 修复 WindTerm 读取 Windows 登录名失败导致的 SSH 连接问题。已在 WindTerm 2.7.0 Windows x86-64 便携版验证。
 
-## 准备原始 DLL
+## 使用现成补丁
 
-下载并解压 `WindTerm_2.7.0_Windows_Portable_x86_64.zip`。[WindTerm 2.7.0 官方发布页](https://github.com/kingToolbox/WindTerm/releases/tag/2.7.0)
+随附的 `ssh-patched.dll` 适用于 **WindTerm 2.7.0 Windows x86-64 便携版**。[WindTerm 2.7.0 官方发布页](https://github.com/kingToolbox/WindTerm/releases/tag/2.7.0)
 
-在解压后的 WindTerm 目录打开 PowerShell，查看 `ssh.dll` 的 SHA-256。
+在 WindTerm 安装目录打开 PowerShell，运行以下命令查看当前 `ssh.dll` 的 SHA-256。
 
 ```powershell
 (Get-FileHash -Algorithm SHA256 -LiteralPath .\ssh.dll).Hash
 ```
 
-2.7.0 Windows x86-64 便携版的原始 `ssh.dll` 哈希为 `1308CE9CC94CBB902E1A8E3A31E10B278E9B12201D938C0A87719B91E6542A09`。
+原始 `ssh.dll` 的 SHA-256 为 `1308CE9CC94CBB902E1A8E3A31E10B278E9B12201D938C0A87719B91E6542A09`。
 
-## 生成并安装补丁
+哈希一致后，完全退出 WindTerm。
 
-确认哈希一致后，在本仓库目录打开 PowerShell。将 `$sshDll` 改成解压后的 `ssh.dll` 路径，用 Python 3 运行以下命令。
+用 `ssh-patched.dll` 替换原目录的 `ssh.dll` , 替换后启动 WindTerm。
 
-```powershell
-$sshDll = 'C:\Apps\WindTerm_2.7.0\ssh.dll'
-python .\patch_ssh.py --input $sshDll --output .\ssh-generated.dll
-```
+## 生成补丁
 
-生成成功后，完全退出 WindTerm。在同一个 PowerShell 窗口运行以下命令，再启动 WindTerm 验证 SSH 登录。
+在本目录用 Python 3 运行以下命令。
 
 ```powershell
-Copy-Item -LiteralPath .\ssh-generated.dll -Destination $sshDll -Force
+python .\patch_ssh.py --input .\ssh-original.dll --output .\ssh-generated.dll
 ```
 
-换版本时，把 `$sshDll` 改成对应版本的路径。脚本在代码段里唯一匹配到目标机器码时才会生成 DLL。
+换版本时，把 `--input` 改成该版本的 `ssh.dll` 路径。脚本在代码段里唯一匹配到目标机器码时才会生成 DLL。
+
+退出 WindTerm 后，用生成的文件替换对应版本安装目录里的 `ssh.dll`，再进行手动验证 SSH 登录。
 
 ## 修复内容
 
