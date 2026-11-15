@@ -1,0 +1,4 @@
+*.dll
+*.dll.*
+__pycache__/
+*.pyc
